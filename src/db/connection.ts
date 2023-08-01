@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import mongoose, { Connection } from "mongoose";
 
-let _db: Connection;
+let _db: Connection | undefined;
 
 const initDb = (callback: (err: Error | null, db?: Connection) => void): void => {
     if (_db) {
@@ -13,11 +13,16 @@ const initDb = (callback: (err: Error | null, db?: Connection) => void): void =>
         .then((client) => {
             _db = client.connection;
             callback(null, _db);
-            console.log("Connected to MongoDB");
         })
         .catch((err) => {
             callback(err);
         });
+};
+
+const closeDb = () => {
+    if (_db) {
+        _db.close();
+    }
 };
 
 const getDb = (): Connection => {
@@ -27,4 +32,4 @@ const getDb = (): Connection => {
     return _db;
 };
 
-export { initDb, getDb };
+export { initDb, getDb, closeDb };

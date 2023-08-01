@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { Request, Response, NextFunction } from 'express';
 import { ObjectId } from "mongodb";
+import { Request } from "express";
 
 export const checkId = (Id: string) => {
     if (!ObjectId.isValid(Id)) {
@@ -20,15 +20,27 @@ export const checkRequiredFields = (data: any, fields: string[] = []) => {
     }
 };
 
+export const checkValidFields = (data: any, validFields: string[] = []) => {
+    const fields: any = {};
+    if (data) {
+        for (const field of validFields) {
+            if (data[field]) {
+                fields[field] = data[field];
+            }
+        }
+    }
+    return fields;
+};
+
 export const checkAuthentication = (request: Request) => {
     if (!request.isAuthenticated()) {
-        throw new GraphQLError("You're not logged in3!");
+        throw new GraphQLError("You're not logged in!");
     }
 };
 
-// Middleware to mock authenticate that is used during testing
-export const mockAuthenticationContext = (context: any) => {
-    context.user = { id: 'testUserId' };
+export const mockContext = (context: any) => {
+    context = { ...context };
+    context.user = { id: "testUserId" };
     context.isAuthenticated = () => true;
     return context;
 };
